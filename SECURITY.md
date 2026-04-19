@@ -15,9 +15,15 @@ Violations must fail CI, not just a human review.
 
 ### Where secrets live
 
-- Local dev: `.env` (gitignored). Template: `.env.example` (committed, values blank).
+- Local dev: `.env` (gitignored). Template: `.env.example` (committed, values blank or local-dev-only placeholders).
 - CI: GitHub Actions secrets, referenced by name only.
 - Production: your deployment platform's secret manager (document which one in `OPERATIONS.md`).
+
+### `DATABASE_URL` specifically
+
+- The local-dev URL in `.env` is the only connection string committed to developer machines.
+- Production `DATABASE_URL` never lives on a developer laptop. It lives in the platform's secret manager and is injected at runtime.
+- Never log the `DATABASE_URL`. The structured logger in `config/logger.ts` does not print env; keep it that way.
 
 ### Before adding a new secret
 

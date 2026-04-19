@@ -11,20 +11,37 @@ production issues without asking a human for tribal knowledge.
 
 - Node.js 20+ (tested on 20 and 25)
 - npm 10+
+- PostgreSQL 16+ running on `localhost:5432`
 
 ### First-time setup
 
 ```bash
 git clone <repo>
 cd <repo>
-cp .env.example .env       # fill in values — see SECURITY.md
+
+# 1. Create the databases (only once per machine)
+createdb harness_starter
+createdb harness_starter_test
+
+# 2. Copy env and adjust DATABASE_URL if your Postgres needs a different user/host
+cp .env.example .env
+$EDITOR .env   # set DATABASE_URL to match your local Postgres
+
+# 3. Install + migrate
 npm install
-npm run check              # should pass on a clean clone
-npm run notes -- create --actor=user:alice --title=hello   # smoke test
+npm run db:migrate
+npm run db:migrate:test
+
+# 4. Verify everything is green
+npm run check
+
+# 5. Smoke test the CLI
+npm run notes -- create --actor=user:alice --title=hello --body=world
 ```
 
-If `npm run check` fails on a clean clone, **stop and flag it**. That's a broken baseline
-and no agent work should proceed on top of it.
+If `npm run check` fails on a clean clone, **stop and flag it**. That's a broken
+baseline and no agent work should proceed on top of it. Most common cause: `.env`
+missing or `DATABASE_URL` wrong — verify with `psql $DATABASE_URL -c 'SELECT 1'`.
 
 ### Common commands
 
@@ -38,7 +55,17 @@ and no agent work should proceed on top of it.
 | `npm run check` | Full gate: typecheck + lint + test + structure + docs + eval |
 | `npm run score` | Compute quality score (reads last coverage run + `npm audit`) |
 | `npm run cleanup:sweep` | Surface entropy candidates (non-modifying) |
+| `npm run db:migrate` | Apply migrations to `DATABASE_URL` |
+| `npm run db:migrate:test` | Apply migrations to `TEST_DATABASE_URL` |
+| `npm run db:reset:test` | Drop + recreate test DB tables (safe — refuses non-test URLs) |
 | `npm run notes -- <cmd>` | Exercise the layered example (`create`, `get`, `list`) |
+
+### Database
+
+- **Primary DB:** `harness_starter` — used by `npm run notes` and local dev.
+- **Test DB:** `harness_starter_test` — used by Postgres contract tests. Tests `TRUNCATE notes` between cases; `npm run db:reset:test` recreates tables if needed.
+- **Migrations:** `migrations/NNNN-*.sql`, applied in order, tracked in `schema_migrations` with sha256 checksums. Never edit an applied migration — add a new one.
+- **Connection pool:** one per process, opened by `src/runtime/wire.ts`, closed via `services.shutdown()`. The CLI calls shutdown in its `finally` block so the process exits cleanly.
 
 ### Single-command feature bring-up
 

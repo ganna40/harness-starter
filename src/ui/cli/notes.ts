@@ -85,6 +85,8 @@ async function run(argv: readonly string[]): Promise<number> {
       `${JSON.stringify({ error: "INTERNAL", message: (err as Error).message })}\n`,
     );
     return 1;
+  } finally {
+    await services.shutdown();
   }
 }
 

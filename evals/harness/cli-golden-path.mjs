@@ -1,21 +1,29 @@
 #!/usr/bin/env node
-// Integration scenario: create a note and fetch it back as the same actor.
-// Uses the runtime/service layer directly — a CLI round-trip doesn't work
-// here because the in-memory repo is per-process (Phase 2 choice).
-// Run with: `npx tsx evals/harness/cli-golden-path.mjs`
+// Integration scenario: real CLI round-trip across two processes, backed by Postgres.
+// Requires DATABASE_URL. Skips with exit 0 if DATABASE_URL is not set.
 
-import { buildServices } from "../../src/runtime/wire.ts";
+import "dotenv/config";
+import { execFileSync } from "node:child_process";
 
-const services = buildServices();
-const actor = { id: "alice" };
+if (!process.env.DATABASE_URL) {
+  console.log("ok (skipped — DATABASE_URL not set)");
+  process.exit(0);
+}
 
-const created = await services.notes.create(actor, { title: "hello", body: "world" });
-if (created.ownerId !== "alice" || created.title !== "hello") {
+const cli = (args) =>
+  execFileSync("npx", ["tsx", "src/ui/cli/notes.ts", ...args], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+const created = JSON.parse(cli(["create", "--actor=user:alice", "--title=round-trip", "--body=w"]));
+if (created.ownerId !== "alice" || created.title !== "round-trip") {
   console.error("FAIL create shape", created);
   process.exit(1);
 }
 
-const fetched = await services.notes.get(actor, created.id);
+// Separate process — this is where in-memory would fail.
+const fetched = JSON.parse(cli(["get", "--actor=user:alice", `--id=${created.id}`]));
 if (fetched.id !== created.id) {
   console.error("FAIL get mismatch", { created, fetched });
   process.exit(1);

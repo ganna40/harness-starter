@@ -1,13 +1,13 @@
 {
   "id": "0009",
-  "title": "Programmatic golden path — create + get round-trip",
+  "title": "CLI golden path — real round-trip across processes (Postgres)",
   "tier": "behavioral",
-  "description": "Builds services via runtime/wire, creates a note as alice, fetches it back. Exercises types → config → repo → service → runtime in one process. If this fails, the layered example is broken at the integration level.",
+  "description": "Spawns the CLI once to create a note, then a separate CLI process to fetch it back by id. Requires DATABASE_URL (Postgres). Exercises every layer plus persistence. Skips gracefully if DATABASE_URL is not set.",
   "type": "command",
-  "command": "npx tsx evals/harness/cli-golden-path.mjs",
+  "command": "node evals/harness/cli-golden-path.mjs",
   "expect": {
     "exitCode": 0,
     "stdoutContains": ["ok"]
   },
-  "tags": ["integration", "golden-path"]
+  "tags": ["cli", "golden-path", "integration", "postgres"]
 }

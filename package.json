@@ -19,18 +19,24 @@
     "eval": "node evals/harness/run.mjs",
     "score": "node scripts/quality-score.mjs",
     "cleanup:sweep": "node scripts/cleanup-sweep.mjs",
+    "db:migrate": "tsx scripts/migrate.mjs",
+    "db:migrate:test": "tsx scripts/migrate.mjs --test",
+    "db:reset:test": "tsx scripts/db-reset-test.mjs",
     "notes": "tsx src/ui/cli/notes.ts",
     "dev": "tsx --watch src/ui/cli/notes.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
     "@vitest/coverage-v8": "^2.1.8",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
+    "pg": "^8.20.0",
     "zod": "^3.24.1"
   }
 }
