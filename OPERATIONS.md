@@ -59,6 +59,26 @@ missing or `DATABASE_URL` wrong — verify with `psql $DATABASE_URL -c 'SELECT 1
 | `npm run db:migrate:test` | Apply migrations to `TEST_DATABASE_URL` |
 | `npm run db:reset:test` | Drop + recreate test DB tables (safe — refuses non-test URLs) |
 | `npm run notes -- <cmd>` | Exercise the layered example (`create`, `get`, `list`) |
+| `PORT=3000 npm run serve` | Start the HTTP server (reads `DATABASE_URL`) |
+
+### HTTP API
+
+Base URL: `http://localhost:$PORT` (default 3000). All JSON; all mutating requests
+need `X-Actor: user:<id>` (see `SECURITY.md` — this is a placeholder for real auth).
+
+| Method | Path | Body | Returns |
+|--------|------|------|---------|
+| `GET`  | `/healthz` | — | `200 {ok: true}` |
+| `POST` | `/notes`   | `{title, body?}` | `201 Note` |
+| `GET`  | `/notes/:id` | — | `200 Note` or `403` (not owner) or `404` |
+| `GET`  | `/notes` | — | `200 Note[]` (actor's own only) |
+
+Error responses:
+- `400 VALIDATION` — zod parse failed or service rejected
+- `401 ACTOR_MISSING` — `X-Actor` header missing
+- `403 UNAUTHORIZED` — actor is not the note's owner
+- `404 NOT_FOUND` — unknown route or unknown note id
+- `500 INTERNAL` — unexpected; check logs
 
 ### Database
 

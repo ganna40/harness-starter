@@ -23,6 +23,7 @@
     "db:migrate:test": "tsx scripts/migrate.mjs --test",
     "db:reset:test": "tsx scripts/db-reset-test.mjs",
     "notes": "tsx src/ui/cli/notes.ts",
+    "serve": "tsx src/ui/http/main.ts",
     "dev": "tsx --watch src/ui/cli/notes.ts"
   },
   "devDependencies": {

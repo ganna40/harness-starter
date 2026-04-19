@@ -74,6 +74,9 @@ const IMPORT_RE =
 
 function checkImports(file) {
   if (!SOURCE_EXTS.has(extname(file))) return;
+  // Test files are exempt from layer-direction rules — tests legitimately compose
+  // multiple layers to verify integration behavior. Production code is enforced.
+  if (/\.test\.(ts|tsx|js|mjs|jsx)$/.test(file)) return;
   const layer = getLayerOfPath(file);
   if (!layer) return;
   const layerIdx = LAYER_INDEX[layer];

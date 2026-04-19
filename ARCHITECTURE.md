@@ -71,6 +71,14 @@ Each layer has a `README.md` explaining its role and a 1-line rule of what it do
 - **One default export max** per file (prefer named exports).
 - **No god modules.** If a file imports from more than 8 different local modules, consider splitting.
 
+### Test-file exception
+
+The import-direction rule **does not apply to `*.test.ts` files**. Tests legitimately
+compose across layers to verify integration behavior (e.g., a `ui/` test may construct
+an `InMemoryNoteRepo` directly to avoid needing the full DB). Production code is still
+strictly enforced. All other checks (file size, secrets, unlinked TODOs) apply to test
+files normally.
+
 ---
 
 ## Error handling

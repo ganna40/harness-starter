@@ -1,0 +1,13 @@
+{
+  "id": "0015",
+  "title": "HTTP authz — non-owner receives 403",
+  "tier": "behavioral",
+  "description": "Alice POSTs a note over HTTP, bob GETs it. Bob must receive 403 UNAUTHORIZED. Mirrors eval 0010 but through the HTTP transport — confirms authz isn't accidentally bypassed by the new boundary parser.",
+  "type": "command",
+  "command": "node evals/harness/http-authz-reject.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["http", "authz", "failure-path", "security"]
+}

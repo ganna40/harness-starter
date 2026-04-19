@@ -1,0 +1,13 @@
+{
+  "id": "0014",
+  "title": "HTTP golden path — real server, Postgres-backed",
+  "tier": "behavioral",
+  "description": "Spawns the HTTP server (`npm run serve`) on an ephemeral-ish port, waits for /healthz, POSTs a note, GETs it back by id, kills the server. Exercises ui/http through service and repo against a real Postgres. Skips gracefully if DATABASE_URL is not set.",
+  "type": "command",
+  "command": "node evals/harness/http-golden-path.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["http", "golden-path", "integration", "postgres"]
+}
