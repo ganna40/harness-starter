@@ -9,6 +9,7 @@ If the *why* changes, it belongs here.
 ## Documents
 
 - [`core-beliefs.md`](./core-beliefs.md) — the ten beliefs that drive every rule in this repo.
+- [`autonomy.md`](./autonomy.md) — how much agents can do without human approval, Level 0–4, with promotion/demotion rules.
 
 ## When to add a new design doc here
 

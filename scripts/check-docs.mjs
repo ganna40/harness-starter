@@ -25,6 +25,7 @@ const REQUIRED = [
   "OPERATIONS.md",
   "QUALITY_SCORE.md",
   "docs/design-docs/core-beliefs.md",
+  "docs/design-docs/autonomy.md",
   "docs/exec-plans/README.md",
   "docs/exec-plans/TEMPLATE.md",
   "docs/decisions/README.md",

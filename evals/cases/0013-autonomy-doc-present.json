@@ -1,0 +1,13 @@
+{
+  "id": "0013",
+  "title": "Autonomy policy doc exists and defines all five levels",
+  "tier": "structural",
+  "description": "docs/design-docs/autonomy.md is the human-agent contract about what agents can do without approval. If this case fails, someone deleted or gutted the policy — no autonomous merges should happen until it's restored. Checks for Level 0 through Level 4 headings, plus the deny-list and demotion-triggers sections.",
+  "type": "command",
+  "command": "node -e \"const fs=require('fs'); const p='docs/design-docs/autonomy.md'; if(!fs.existsSync(p)){console.error('missing '+p); process.exit(1);} const c=fs.readFileSync(p,'utf8'); const required=['Level 0','Level 1','Level 2','Level 3','Level 4','Deny list','Promotion criteria','Demotion triggers']; const missing=required.filter(r=>!c.includes(r)); if(missing.length){console.error('autonomy.md missing sections: '+missing.join(', ')); process.exit(1);} console.log('ok');\"",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["governance", "docs", "agent-contract"]
+}

@@ -121,3 +121,13 @@ runtime/wire.ts          ← new UserService({ users: new PostgresUserRepo(...) 
 ```
 
 This makes `service/` testable without the DB and keeps the dependency direction clean.
+
+---
+
+## Autonomy level
+
+**Current level: Level 1 — Propose only.**
+
+Agents may open PRs; humans merge. See `docs/design-docs/autonomy.md` for the full
+policy, promotion criteria, and the deny list of files that require human merge
+regardless of level.

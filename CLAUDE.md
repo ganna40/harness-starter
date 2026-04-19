@@ -23,6 +23,7 @@ When these disagree with the code, **the code wins** — update the doc in the s
 | `docs/design-docs/core-beliefs.md` | Product/engineering principles (why the rules exist) |
 | `docs/exec-plans/active/` | In-flight work — check here before starting anything |
 | `docs/decisions/` | ADRs — past decisions and their rationale |
+| `docs/design-docs/autonomy.md` | **How much you can do without human approval** — read before merging |
 | `SECURITY.md` | Secrets, PII, authz rules |
 | `QUALITY_SCORE.md` | How quality is measured on this repo |
 | `OPERATIONS.md` | How to run, debug, observe |
@@ -65,6 +66,8 @@ When these disagree with the code, **the code wins** — update the doc in the s
 ## Escalation — stop and ask the human when:
 
 - You need to cross a layer boundary and no ADR covers it.
+- You are about to touch a file in `docs/design-docs/autonomy.md`'s **deny list** — those always require human merge regardless of autonomy level.
+- The autonomy level you're on doesn't permit the action you're about to take (check `docs/design-docs/autonomy.md`).
 - A test fails and you cannot explain why after reading the relevant code.
 - A dependency needs to be added, upgraded, or removed.
 - The task scope is unclear or the exec plan is silent on a decision you must make.

@@ -1,0 +1,13 @@
+{
+  "id": "0012",
+  "title": "Quality score on main is at least 85 (GREEN threshold)",
+  "tier": "structural",
+  "description": "The score gate. If this case fails, the repo has slipped below GREEN (<85) and autonomous merges should be paused per docs/design-docs/autonomy.md. Fixing the score regression is always higher priority than feature work. Uses the latest evals/reports/quality-*.json; runs the scorer first if none exists.",
+  "type": "command",
+  "command": "node evals/harness/score-threshold.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["governance", "score", "ci-gating"]
+}

@@ -12,7 +12,8 @@ Fixing an item: open a short exec plan, reference this file, remove the row when
 
 | ID | Area | Severity | Description | Found | Owner |
 |----|------|:-:|-------------|-------|-------|
-| TD-0001 | harness | S3 | `scripts/quality-score.mjs` uses placeholder scoring — wire real inputs when stack is chosen | 2026-04-19 | unclaimed |
+| TD-0001 | harness | S3 | ~~`scripts/quality-score.mjs` uses placeholder scoring~~ — fixed in Phase 2, closed | 2026-04-19 | closed |
+| TD-0002 | deps | S2 | 6 moderate vulns transitive via `vitest → vite`. `npm audit fix` non-breaking yields nothing. Resolution: dedicated vitest-major-upgrade PR. Cost: run full check + coverage; risk: test-runner API surface may drift. Impact on quality score: `deps` dimension stuck at 4/10. | 2026-04-19 | unclaimed |
 
 ## Rules
 
