@@ -1,0 +1,10 @@
+{
+  "id": "0005",
+  "title": "CLAUDE.md contains the non-negotiable rules section",
+  "tier": "structural",
+  "description": "CLAUDE.md is the agent briefing. If the 'Non-negotiable rules' header is removed, agents lose the list of hard constraints. This case pins it in place.",
+  "type": "command",
+  "command": "node -e \"const c=require('fs').readFileSync('CLAUDE.md','utf8'); process.exit(c.includes('Non-negotiable rules')?0:1);\"",
+  "expect": { "exitCode": 0 },
+  "tags": ["docs", "agent-contract"]
+}

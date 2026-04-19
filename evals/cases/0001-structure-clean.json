@@ -1,0 +1,13 @@
+{
+  "id": "0001",
+  "title": "Architecture check produces zero violations on a clean repo",
+  "tier": "structural",
+  "description": "The structure check is the mechanical enforcement of ARCHITECTURE.md. On main, it must always pass with zero violations. If this case fails, something imported across a forbidden boundary or committed a secret.",
+  "type": "command",
+  "command": "node scripts/check-structure.mjs --json",
+  "expect": {
+    "exitCode": 0,
+    "jsonPath": { "$.violations.length": 0 }
+  },
+  "tags": ["structure", "ci-gating"]
+}

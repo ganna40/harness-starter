@@ -1,0 +1,10 @@
+{
+  "id": "0006",
+  "title": "Eval runner accepts a known-good case and fails a known-bad case",
+  "tier": "structural",
+  "description": "Trivial smoke test: the runner itself works. Running 'true' should pass; running 'false' should fail. If this case's command fails, the harness is broken — not the repo.",
+  "type": "command",
+  "command": "sh -c 'true && ! false; echo result=$?'",
+  "expect": { "exitCode": 0 },
+  "tags": ["harness", "smoke"]
+}

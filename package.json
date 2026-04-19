@@ -1,0 +1,20 @@
+{
+  "name": "harness-starter",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agent-first development harness — templates, rules, scripts, evals.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "npm run check:structure && npm run check:docs && npm run eval",
+    "check:structure": "node scripts/check-structure.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
+    "eval": "node evals/harness/run.mjs",
+    "score": "node scripts/quality-score.mjs",
+    "cleanup:sweep": "node scripts/cleanup-sweep.mjs",
+    "dev": "echo 'Add your dev command here (e.g., next dev, uvicorn, etc.)' && exit 0"
+  },
+  "devDependencies": {}
+}

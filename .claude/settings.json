@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install)",
+      "Bash(npm audit)",
+      "Bash(node scripts/*)",
+      "Bash(node evals/*)",
+      "Bash(git status)",
+      "Bash(git status:*)",
+      "Bash(git diff)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(git stash:*)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git commit --no-verify*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/*id_rsa*)",
+      "Read(**/*.pem)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '--- Before opening a PR: npm run check must pass. If you changed behavior or interfaces, update the relevant doc in the same PR.'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/pre-edit-guard.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

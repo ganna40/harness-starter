@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    name: harness checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Structure check
+        run: node scripts/check-structure.mjs
+      - name: Docs check
+        run: node scripts/check-docs.mjs
+      - name: Eval harness
+        run: node evals/harness/run.mjs
+      - name: Quality score (report only, not gating)
+        run: node scripts/quality-score.mjs
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-reports
+          path: evals/reports/
+          retention-days: 14

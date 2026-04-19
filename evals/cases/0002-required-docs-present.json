@@ -1,0 +1,13 @@
+{
+  "id": "0002",
+  "title": "All required docs exist",
+  "tier": "structural",
+  "description": "check-docs.mjs fails with 'Missing required docs' if any of CLAUDE.md, ARCHITECTURE.md, SECURITY.md, etc. are missing. This case ensures the harness docs aren't silently removed.",
+  "type": "command",
+  "command": "node scripts/check-docs.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutNotContains": ["Missing required docs"]
+  },
+  "tags": ["docs", "ci-gating"]
+}

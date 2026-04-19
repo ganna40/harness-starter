@@ -1,0 +1,10 @@
+{
+  "id": "0003",
+  "title": "ADR template and initial ADR are present",
+  "tier": "structural",
+  "description": "The decision log must have a template and at least one accepted ADR (0001-harness-engineering) explaining the harness design itself. If this case fails, someone deleted load-bearing decision records.",
+  "type": "command",
+  "command": "node -e \"const fs=require('fs'); const ok = fs.existsSync('docs/decisions/TEMPLATE.md') && fs.existsSync('docs/decisions/0001-harness-engineering.md'); process.exit(ok?0:1);\"",
+  "expect": { "exitCode": 0 },
+  "tags": ["docs", "decisions"]
+}

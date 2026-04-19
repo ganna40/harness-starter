@@ -1,0 +1,50 @@
+name: Weekly quality report
+
+on:
+  schedule:
+    - cron: "0 9 * * 1"   # Mondays 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run quality score
+        id: score
+        run: |
+          node scripts/quality-score.mjs | tee score.txt
+          echo "report_file=$(ls -t evals/reports/quality-*.json | head -1)" >> "$GITHUB_OUTPUT"
+      - name: Run cleanup sweep
+        run: node scripts/cleanup-sweep.mjs | tee sweep.txt
+      - name: Open issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const score = fs.readFileSync('score.txt', 'utf8');
+            const sweep = fs.readFileSync('sweep.txt', 'utf8');
+            const today = new Date().toISOString().slice(0,10);
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Weekly quality report — ${today}`,
+              labels: ['quality-report'],
+              body: [
+                '## Score',
+                '```',
+                score,
+                '```',
+                '## Cleanup candidates',
+                '```',
+                sweep,
+                '```',
+                '_See `QUALITY_SCORE.md` for what these mean._',
+              ].join('\n'),
+            });
