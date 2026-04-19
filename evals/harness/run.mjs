@@ -130,6 +130,8 @@ for (const c of cases) {
     passed: fails.length === 0,
     reason: fails.length ? fails.join("; ") : null,
     flaky: !!c.flaky,
+    stdout: r.stdout,
+    stderr: r.stderr,
   });
 }
 
@@ -137,14 +139,25 @@ const passed = results.filter((r) => r.passed).length;
 const total = results.length;
 const hardFails = results.filter((r) => !r.passed && !r.flaky && !r.skipped).length;
 
+const summarizedResults = results.map(({ stdout: _s, stderr: _e, ...rest }) => rest);
+
 if (JSON_OUT) {
-  console.log(JSON.stringify({ passed, total, hardFails, results }, null, 2));
+  console.log(JSON.stringify({ passed, total, hardFails, results: summarizedResults }, null, 2));
 } else {
   console.log(`\nEval harness: ${passed}/${total} passed\n`);
   for (const r of results) {
     const mark = r.passed ? "✓" : r.flaky ? "⚠" : r.skipped ? "·" : "✗";
     console.log(`  ${mark} ${r.id}  ${r.title ?? ""}`);
     if (!r.passed && r.reason) console.log(`      ${r.reason}`);
+    // On failure, dump the child's stderr so CI logs show the actual error.
+    // Tailed, not full, to keep the eval summary readable.
+    if (!r.passed && !r.skipped && r.stderr) {
+      const trimmed = r.stderr.trim();
+      if (trimmed) {
+        const last = trimmed.split("\n").slice(-10).join("\n      ");
+        console.log(`      stderr (last 10 lines):\n      ${last}`);
+      }
+    }
   }
 }
 
@@ -155,7 +168,13 @@ try {
   writeFileSync(
     join(ROOT, "evals", "reports", `eval-${today}.json`),
     JSON.stringify(
-      { generatedAt: new Date().toISOString(), passed, total, hardFails, results },
+      {
+        generatedAt: new Date().toISOString(),
+        passed,
+        total,
+        hardFails,
+        results: summarizedResults,
+      },
       null,
       2,
     ),

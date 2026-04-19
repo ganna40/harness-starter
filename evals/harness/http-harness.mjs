@@ -36,9 +36,13 @@ export async function withServer(fn) {
       }, 3000);
     });
 
-  // Poll healthz for up to ~5s
+  // Poll healthz for up to ~30s. `npx tsx` cold start on CI runners can take
+  // 10–15s; 30s is a generous ceiling that still fails fast if something's actually broken.
+  const readinessTimeoutMs = Number(process.env.HTTP_HARNESS_TIMEOUT_MS ?? 30_000);
+  const pollIntervalMs = 200;
+  const maxAttempts = Math.ceil(readinessTimeoutMs / pollIntervalMs);
   let ready = false;
-  for (let i = 0; i < 50; i += 1) {
+  for (let i = 0; i < maxAttempts; i += 1) {
     try {
       const res = await fetch(`${baseUrl}/healthz`);
       if (res.ok) {
@@ -48,11 +52,11 @@ export async function withServer(fn) {
     } catch {
       // not yet
     }
-    await delay(100);
+    await delay(pollIntervalMs);
   }
   if (!ready) {
     await kill();
-    console.error("server did not become ready within 5s");
+    console.error(`server did not become ready within ${readinessTimeoutMs}ms`);
     console.error("server stdout:", stdoutChunks.join(""));
     process.exit(1);
   }
