@@ -8,13 +8,29 @@
     "node": ">=20"
   },
   "scripts": {
-    "check": "npm run check:structure && npm run check:docs && npm run eval",
+    "check": "npm run typecheck && npm run lint && npm run test -- --run && npm run check:structure && npm run check:docs && npm run eval",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
     "check:structure": "node scripts/check-structure.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "eval": "node evals/harness/run.mjs",
     "score": "node scripts/quality-score.mjs",
     "cleanup:sweep": "node scripts/cleanup-sweep.mjs",
-    "dev": "echo 'Add your dev command here (e.g., next dev, uvicorn, etc.)' && exit 0"
+    "notes": "tsx src/ui/cli/notes.ts",
+    "dev": "tsx --watch src/ui/cli/notes.ts"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^25.6.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  }
 }

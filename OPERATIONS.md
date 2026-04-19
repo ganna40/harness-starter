@@ -9,12 +9,8 @@ production issues without asking a human for tribal knowledge.
 
 ### Prerequisites
 
-<!-- REPLACE with your stack. Example: -->
-<!-- - Node.js 20.x -->
-<!-- - Docker (for local Postgres) -->
-<!-- - pnpm 9.x -->
-
-[TEMPLATE — fill in.]
+- Node.js 20+ (tested on 20 and 25)
+- npm 10+
 
 ### First-time setup
 
@@ -24,11 +20,25 @@ cd <repo>
 cp .env.example .env       # fill in values — see SECURITY.md
 npm install
 npm run check              # should pass on a clean clone
-npm run dev                # start the app
+npm run notes -- create --actor=user:alice --title=hello   # smoke test
 ```
 
 If `npm run check` fails on a clean clone, **stop and flag it**. That's a broken baseline
 and no agent work should proceed on top of it.
+
+### Common commands
+
+| Command | What it does |
+|---------|--------------|
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | Biome check (lint + format) |
+| `npm run lint:fix` | Apply safe Biome fixes |
+| `npm test` | Vitest watch mode |
+| `npm run test:coverage` | Vitest + coverage (writes `coverage/`) |
+| `npm run check` | Full gate: typecheck + lint + test + structure + docs + eval |
+| `npm run score` | Compute quality score (reads last coverage run + `npm audit`) |
+| `npm run cleanup:sweep` | Surface entropy candidates (non-modifying) |
+| `npm run notes -- <cmd>` | Exercise the layered example (`create`, `get`, `list`) |
 
 ### Single-command feature bring-up
 

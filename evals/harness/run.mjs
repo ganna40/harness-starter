@@ -5,7 +5,7 @@
 // Currently supports type: "command". Fixture/http types are planned.
 
 import { execSync } from "node:child_process";
-import { readFileSync, readdirSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -41,8 +41,8 @@ function runCommand(c) {
   } catch (e) {
     return {
       exitCode: e.status ?? 1,
-      stdout: (e.stdout?.toString() ?? ""),
-      stderr: (e.stderr?.toString() ?? ""),
+      stdout: e.stdout?.toString() ?? "",
+      stderr: e.stderr?.toString() ?? "",
     };
   }
 }
@@ -154,7 +154,11 @@ try {
   const today = new Date().toISOString().slice(0, 10);
   writeFileSync(
     join(ROOT, "evals", "reports", `eval-${today}.json`),
-    JSON.stringify({ generatedAt: new Date().toISOString(), passed, total, hardFails, results }, null, 2),
+    JSON.stringify(
+      { generatedAt: new Date().toISOString(), passed, total, hardFails, results },
+      null,
+      2,
+    ),
   );
 } catch {
   // ignore report write errors

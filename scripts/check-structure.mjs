@@ -14,8 +14,8 @@
 //   node scripts/check-structure.mjs --quiet   # only print failures
 //   node scripts/check-structure.mjs --json    # machine-readable output
 
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { join, relative, extname } from "node:path";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { extname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(fileURLToPath(import.meta.url), "..", "..");
@@ -94,8 +94,7 @@ function checkImports(file) {
           const key = `${layer}->${candidate}`;
           if (EXCEPTIONS.has(key)) return;
           violate(
-            `Forbidden import: ${layer}/ cannot import from ${candidate}/ (${target}). ` +
-              `Outer layers may only import inner. See ARCHITECTURE.md.`,
+            `Forbidden import: ${layer}/ cannot import from ${candidate}/ (${target}). Outer layers may only import inner. See ARCHITECTURE.md.`,
             file,
             i + 1,
           );
@@ -158,11 +157,7 @@ function checkTodos(file) {
     if (/harness-ignore-todo/.test(line)) return;
     if (/TODO\s*\(#\d+\)/.test(line)) return;
     if (/TODO.*https?:\/\//.test(line)) return;
-    warn(
-      `Unlinked TODO (use 'TODO(#123): ...' or link a URL)`,
-      file,
-      i + 1,
-    );
+    warn(`Unlinked TODO (use 'TODO(#123): ...' or link a URL)`, file, i + 1);
   });
 }
 

@@ -1,0 +1,13 @@
+{
+  "id": "0010",
+  "title": "Authz — non-owner cannot fetch a note",
+  "tier": "behavioral",
+  "description": "Alice creates a note, bob tries to fetch it via the same NoteService. Expected: UnauthorizedError. This guards against the silent-authz-bypass regression — a common fault when service/ trusts raw IDs without checking the actor.",
+  "type": "command",
+  "command": "npx tsx evals/harness/cli-authz-reject.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["authz", "failure-path", "security"]
+}

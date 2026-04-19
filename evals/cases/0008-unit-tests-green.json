@@ -1,0 +1,14 @@
+{
+  "id": "0008",
+  "title": "All unit and integration tests pass",
+  "tier": "behavioral",
+  "description": "Vitest must report 0 failures. If any test fails here, the product is broken or a test is wrong — investigate before merging.",
+  "type": "command",
+  "command": "npx vitest run",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["Test Files", "passed"],
+    "stdoutNotContains": ["failed"]
+  },
+  "tags": ["tests", "ci-gating"]
+}

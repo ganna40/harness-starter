@@ -11,7 +11,7 @@
 // Exits non-zero only on missing required docs. Stale-doc warnings don't fail CI
 // (too noisy); they show up in the weekly quality score instead.
 
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,7 +36,7 @@ for (const r of REQUIRED) {
   if (!existsSync(join(ROOT, r))) missing.push(r);
 }
 if (missing.length) {
-  console.log(`✗  Missing required docs:`);
+  console.log("✗  Missing required docs:");
   for (const m of missing) console.log(`    ${m}`);
   process.exit(1);
 }
@@ -66,7 +66,7 @@ const staleArch = srcFiles.some((f) => statSync(f).mtimeMs > archM);
 const warnings = [];
 if (staleArch) {
   warnings.push(
-    `ARCHITECTURE.md is older than some files in src/. Review whether boundaries changed.`,
+    "ARCHITECTURE.md is older than some files in src/. Review whether boundaries changed.",
   );
 }
 

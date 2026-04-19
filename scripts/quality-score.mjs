@@ -14,7 +14,7 @@
 // Output: console summary + JSON at evals/reports/quality-YYYY-MM-DD.json
 
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,7 +33,12 @@ const dims = [];
 // ---- Structure (20) ----
 {
   const r = tryRun("node scripts/check-structure.mjs --quiet");
-  dims.push({ name: "structure", weight: 20, score: r.ok ? 20 : 0, note: r.ok ? "pass" : "violations" });
+  dims.push({
+    name: "structure",
+    weight: 20,
+    score: r.ok ? 20 : 0,
+    note: r.ok ? "pass" : "violations",
+  });
 }
 
 // ---- Docs (15) ----
@@ -47,7 +52,8 @@ const dims = [];
 // ---- Evals (15) ----
 {
   const r = tryRun("node evals/harness/run.mjs --json");
-  let pass = 0, total = 0;
+  let pass = 0;
+  let total = 0;
   try {
     const j = JSON.parse(r.out);
     pass = j.passed;
@@ -67,7 +73,8 @@ const dims = [];
 // ---- Plans hygiene (10) ----
 {
   const activeDir = join(ROOT, "docs/exec-plans/active");
-  let stale = 0, total = 0;
+  let stale = 0;
+  let total = 0;
   if (existsSync(activeDir)) {
     const fortnight = 14 * 24 * 60 * 60 * 1000;
     const now = Date.now();
@@ -85,26 +92,81 @@ const dims = [];
 {
   const r = tryRun("node scripts/cleanup-sweep.mjs");
   const m = r.out.match(/oversizeFiles:\s*(\d+)/);
-  const oversize = m ? parseInt(m[1]) : 0;
+  const oversize = m ? Number.parseInt(m[1]) : 0;
   const score = Math.max(0, 10 - oversize * 2);
   dims.push({ name: "filesize", weight: 10, score, note: `${oversize} oversize file(s)` });
 }
 
-// ---- Coverage (15) — placeholder ----
-dims.push({
-  name: "coverage",
-  weight: 15,
-  score: 0,
-  note: "PLACEHOLDER — wire up when stack is chosen (see QUALITY_SCORE.md)",
-});
+// ---- Coverage (15) ----
+// Reads coverage/coverage-summary.json written by `vitest run --coverage`.
+// If the file is missing (tests not run with coverage), emits a prompt rather than scoring 0.
+{
+  const summaryPath = join(ROOT, "coverage/coverage-summary.json");
+  if (!existsSync(summaryPath)) {
+    dims.push({
+      name: "coverage",
+      weight: 15,
+      score: 0,
+      note: "no coverage/coverage-summary.json — run `npm run test:coverage`",
+    });
+  } else {
+    try {
+      const summary = JSON.parse(readFileSync(summaryPath, "utf8"));
+      const lines = summary.total?.lines?.pct ?? 0;
+      const branches = summary.total?.branches?.pct ?? 0;
+      // Weighted: 70% lines, 30% branches. 100% pct ⇒ 15 points.
+      const pct = 0.7 * lines + 0.3 * branches;
+      dims.push({
+        name: "coverage",
+        weight: 15,
+        score: Math.round((pct / 100) * 15),
+        note: `${lines.toFixed(0)}% lines, ${branches.toFixed(0)}% branches`,
+      });
+    } catch (e) {
+      dims.push({
+        name: "coverage",
+        weight: 15,
+        score: 0,
+        note: `coverage-summary.json unreadable: ${e.message}`,
+      });
+    }
+  }
+}
 
-// ---- Deps (10) — placeholder ----
-dims.push({
-  name: "deps",
-  weight: 10,
-  score: 10,
-  note: "PLACEHOLDER — `npm audit` wiring pending",
-});
+// ---- Deps (10) ----
+// Runs `npm audit --json`. Scoring:
+//   starts at 10, -5 per critical, -3 per high, -1 per moderate, -0 for low.
+//   floor at 0.
+{
+  const r = tryRun("npm audit --json");
+  // npm audit exits non-zero when it finds issues — that's expected and not a run failure.
+  let audit;
+  try {
+    audit = JSON.parse(r.out);
+  } catch {
+    audit = null;
+  }
+  if (!audit?.metadata?.vulnerabilities) {
+    dims.push({
+      name: "deps",
+      weight: 10,
+      score: 10,
+      note: "no audit output — no deps or tool unavailable",
+    });
+  } else {
+    const v = audit.metadata.vulnerabilities;
+    const score = Math.max(
+      0,
+      10 - (v.critical ?? 0) * 5 - (v.high ?? 0) * 3 - (v.moderate ?? 0) * 1,
+    );
+    dims.push({
+      name: "deps",
+      weight: 10,
+      score,
+      note: `crit:${v.critical ?? 0} high:${v.high ?? 0} mod:${v.moderate ?? 0} low:${v.low ?? 0}`,
+    });
+  }
+}
 
 // ---- PR hygiene (5) — placeholder ----
 dims.push({
@@ -133,8 +195,12 @@ console.log(`\nQuality Score: ${total}/100  (${verdict})\n`);
 console.log("Dimension       Score/Weight   Note");
 console.log("---------------- ------------  ---------------------");
 for (const d of dims) {
-  console.log(`${d.name.padEnd(16)} ${String(d.score).padStart(3)}/${String(d.weight).padEnd(3)}        ${d.note}`);
+  console.log(
+    `${d.name.padEnd(16)} ${String(d.score).padStart(3)}/${String(d.weight).padEnd(3)}        ${d.note}`,
+  );
 }
 console.log();
 console.log(`Report: evals/reports/quality-${today}.json`);
-console.log(`Verdict thresholds: >=85 GREEN, >=70 YELLOW, >=50 RED, <50 FREEZE (see QUALITY_SCORE.md)`);
+console.log(
+  "Verdict thresholds: >=85 GREEN, >=70 YELLOW, >=50 RED, <50 FREEZE (see QUALITY_SCORE.md)",
+);

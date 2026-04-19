@@ -1,0 +1,10 @@
+{
+  "id": "0007",
+  "title": "TypeScript type checker is clean",
+  "tier": "structural",
+  "description": "`tsc --noEmit` must exit 0 on main. A TS error means real code or types are broken — not a style issue.",
+  "type": "command",
+  "command": "npx tsc --noEmit",
+  "expect": { "exitCode": 0 },
+  "tags": ["typecheck", "ci-gating"]
+}

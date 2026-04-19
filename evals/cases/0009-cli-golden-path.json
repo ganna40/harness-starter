@@ -1,0 +1,13 @@
+{
+  "id": "0009",
+  "title": "Programmatic golden path — create + get round-trip",
+  "tier": "behavioral",
+  "description": "Builds services via runtime/wire, creates a note as alice, fetches it back. Exercises types → config → repo → service → runtime in one process. If this fails, the layered example is broken at the integration level.",
+  "type": "command",
+  "command": "npx tsx evals/harness/cli-golden-path.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["integration", "golden-path"]
+}

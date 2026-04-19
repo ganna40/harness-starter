@@ -1,0 +1,13 @@
+{
+  "id": "0011",
+  "title": "CLI smoke — single create returns valid JSON",
+  "tier": "behavioral",
+  "description": "Spawns the CLI once, creates a note, and validates the response shape. Proves ui/cli is wired and runnable end-to-end through tsx. Does not test round-trip — see case 0009 for that (in-memory repo is per-process).",
+  "type": "command",
+  "command": "node evals/harness/cli-smoke.mjs",
+  "expect": {
+    "exitCode": 0,
+    "stdoutContains": ["ok"]
+  },
+  "tags": ["cli", "smoke"]
+}

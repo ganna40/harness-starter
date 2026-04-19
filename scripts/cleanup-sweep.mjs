@@ -14,15 +14,8 @@
 //
 // Output: human-readable report + JSON at evals/reports/sweep-YYYY-MM-DD.json
 
-import {
-  readFileSync,
-  readdirSync,
-  statSync,
-  existsSync,
-  writeFileSync,
-  mkdirSync,
-} from "node:fs";
-import { join, relative, extname, basename } from "node:path";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { basename, extname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(fileURLToPath(import.meta.url), "..", "..");
@@ -63,7 +56,7 @@ for (const f of allFiles) {
     if (/TODO\s*\(#\d+\)/.test(line)) return;
     if (/TODO.*https?:\/\//.test(line)) return;
     // Skip regex-literal mentions of task markers in this tool's own patterns  // harness-ignore-todo
-    if (/\/TODO[\\\]\b\/\.]/.test(line) || /\/\\bTODO\\b\//.test(line)) return;  // harness-ignore-todo
+    if (/\/TODO[\\\]\b\/\.]/.test(line) || /\/\\bTODO\\b\//.test(line)) return; // harness-ignore-todo
     report.findings.todos.push({ file: relative(ROOT, f), line: i + 1, text: line.trim() });
   });
 }
@@ -110,12 +103,13 @@ for (const f of mdFiles) {
   let p = rel;
   while (p.includes("/")) {
     p = p.slice(0, p.lastIndexOf("/"));
-    ancestors.push(p + "/");
+    ancestors.push(`${p}/`);
   }
   const referenced = mdFiles.some((other) => {
     if (other === f) return false;
     const content = mdContent[other];
-    if (content.includes(rel) || content.includes(`./${rel}`) || content.includes(name)) return true;
+    if (content.includes(rel) || content.includes(`./${rel}`) || content.includes(name))
+      return true;
     return ancestors.some((a) => content.includes(a));
   });
   if (!referenced) {
@@ -140,4 +134,4 @@ for (const [category, items] of Object.entries(report.findings)) {
   if (items.length > 10) console.log(`    ... and ${items.length - 10} more`);
 }
 console.log(`\nReport written to ${relative(ROOT, outPath)}`);
-console.log(`Decide PR-by-PR what to actually clean up. See .claude/commands/cleanup.md.`);
+console.log("Decide PR-by-PR what to actually clean up. See .claude/commands/cleanup.md.");
