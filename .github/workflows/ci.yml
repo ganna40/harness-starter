@@ -54,10 +54,10 @@ jobs:
         run: npm run lint
       - name: Tests (with coverage)
         run: npm run test:coverage
+      - name: Quality score (seeds report for eval 0012)
+        run: node scripts/quality-score.mjs
       - name: Eval harness
         run: node evals/harness/run.mjs
-      - name: Quality score (report only, not gating)
-        run: node scripts/quality-score.mjs
       - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4

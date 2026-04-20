@@ -5,7 +5,6 @@
 // Threshold comes from autonomy.md: 85 = GREEN. Dropping below this halts autonomous
 // merges per docs/design-docs/autonomy.md.
 
-import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,14 +21,15 @@ function latestReport() {
   return files.length ? join(REPORTS, files[files.length - 1]) : null;
 }
 
-let reportPath = latestReport();
+const reportPath = latestReport();
 if (!reportPath) {
-  execSync("node scripts/quality-score.mjs", { cwd: ROOT, stdio: "pipe" });
-  reportPath = latestReport();
-}
-
-if (!reportPath) {
-  console.error("no quality report available");
+  // Don't regenerate the report here — quality-score.mjs itself runs the eval harness,
+  // which would recursively invoke this case. Instead, fail clearly and tell the caller
+  // to run `npm run score` first. CI runs the scorer before the eval step; local dev
+  // should too.
+  console.error(
+    "no quality report found at evals/reports/quality-*.json — run `npm run score` first",
+  );
   process.exit(2);
 }
 

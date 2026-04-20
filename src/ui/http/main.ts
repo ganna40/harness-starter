@@ -13,6 +13,8 @@ server.listen(port, () => {
 
 async function shutdown(signal: string): Promise<void> {
   services.logger.info("http.shutdown.start", { signal });
+  // Force-close any keepalive connections so server.close() doesn't block on them.
+  server.closeAllConnections();
   await new Promise<void>((resolve) => server.close(() => resolve()));
   await services.shutdown();
   services.logger.info("http.shutdown.done");
