@@ -30,10 +30,12 @@ export async function withServer(fn) {
       if (child.killed || child.exitCode !== null) return resolve();
       child.once("exit", () => resolve());
       child.kill("SIGTERM");
-      // Hard kill if SIGTERM didn't do it in 3s
-      setTimeout(() => {
+      // Hard kill if SIGTERM didn't do it in 3s. unref() so the timer doesn't
+      // hold the event loop open once we've resolved.
+      const t = setTimeout(() => {
         if (!child.killed) child.kill("SIGKILL");
       }, 3000);
+      t.unref();
     });
 
   // Poll healthz for up to ~30s. `npx tsx` cold start on CI runners can take
@@ -61,9 +63,20 @@ export async function withServer(fn) {
     process.exit(1);
   }
 
+  let scenarioError = null;
   try {
     await fn(baseUrl);
+  } catch (err) {
+    scenarioError = err;
   } finally {
     await kill();
   }
+
+  // Force clean exit — fetch's keepalive agent and any stray handles can
+  // otherwise delay node's natural exit until the eval harness's 60s timeout.
+  if (scenarioError) {
+    console.error("scenario failed:", scenarioError);
+    process.exit(1);
+  }
+  process.exit(0);
 }
